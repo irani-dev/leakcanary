@@ -5,6 +5,7 @@ dependencies {
   debugImplementation project(':leakcanary-android')
 
   implementation deps.kotlin.stdlib
+  implementation deps.androidx.fragment
 
   testImplementation deps.junit
   testImplementation deps.robolectric

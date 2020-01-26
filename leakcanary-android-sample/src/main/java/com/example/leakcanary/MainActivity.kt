@@ -15,15 +15,24 @@
  */
 package com.example.leakcanary
 
-import android.app.Activity
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.View
 import android.widget.Button
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.Factory
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.random.Random
 
-class MainActivity : Activity() {
+class MainActivity : FragmentActivity() {
+
+  class DumbViewModel : ViewModel() {
+    init {
+      leakedViewModels += this
+    }
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -31,6 +40,12 @@ class MainActivity : Activity() {
 
     val app = application as ExampleApplication
     val leakedView = findViewById<View>(R.id.helper_text)
+
+    // Create a dumb view model that will leak.
+    ViewModelProvider(this, object : Factory {
+      @Suppress("UNCHECKED_CAST")
+      override fun <T : ViewModel?> create(modelClass: Class<T>): T = DumbViewModel() as T
+    }).get(DumbViewModel::class.java)
 
     findViewById<Button>(R.id.recreate_activity_button).setOnClickListener { recreate() }
 
@@ -56,5 +71,9 @@ class MainActivity : Activity() {
       // Leak from thread fields
       else -> LeakingThread.thread.leakedViews.add(leakedView)
     }
+  }
+
+  companion object {
+    val leakedViewModels = mutableListOf<DumbViewModel>()
   }
 }

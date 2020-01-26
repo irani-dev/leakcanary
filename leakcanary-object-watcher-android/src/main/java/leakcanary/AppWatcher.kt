@@ -44,6 +44,13 @@ object AppWatcher {
     val watchFragmentViews: Boolean = true,
 
     /**
+     * Whether AppWatcher should automatically watch cleared view model instances.
+     *
+     * Defaults to true.
+     */
+    val watchViewModels: Boolean = true,
+
+    /**
      * How long to wait before reporting a watched object as retained.
      *
      * Default to 5 seconds.
